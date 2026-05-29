@@ -4,8 +4,13 @@ import telebot
 # CONFIG
 # =====================================
 
-TOKEN = "8662189428:AAHE702xAkCJ9Mie-_4XsLrsKyomFcSLSTQ"
+TOKEN = "TOKEN_BOT_KAMU"
+
+# ID CHANNEL
 CHANNEL_ID = -1003949063805
+
+# ID GROUP DISKUSI / KOMENTAR
+DISCUSSION_GROUP_ID = -100XXXXXXXXXX
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -46,7 +51,7 @@ BAD_WORDS = [
 ]
 
 # =====================================
-# CEK KATA TERLARANG
+# FILTER KATA
 # =====================================
 
 def contains_bad_words(text):
@@ -67,10 +72,14 @@ def contains_bad_words(text):
 @bot.message_handler(commands=['start'])
 def start(message):
 
-    bot.reply_to(
-        message,
-        "👋 Kirim menfess text atau foto."
-    )
+    teks = """
+parker di sini, ada parker jangan lari 🐾
+
+send menfess kamu ya!
+taati peraturan di @parkerinfo
+"""
+
+    bot.reply_to(message, teks)
 
 # =====================================
 # TEXT
@@ -84,7 +93,7 @@ def handle_text(message):
 
     try:
 
-        # cek kata terlarang
+        # filter kata terlarang
         if contains_bad_words(message.text):
 
             bot.reply_to(
@@ -94,22 +103,33 @@ def handle_text(message):
 
             return
 
-        # kirim post utama
+        # kirim ke channel
         sent = bot.send_message(
             CHANNEL_ID,
             message.text
         )
 
-        # komentar otomatis
+        # link post
+        post_link = f"https://t.me/c/{str(CHANNEL_ID)[4:]}/{sent.message_id}"
+
+        # kirim komentar otomatis ke grup diskusi
         komentar = """
-scam, perusuh, penipu tag @admins
-informasi base & paid promote @parkerinfo
+Ada scammer/rusuh? Tag @admin
+atau /report 3x maka otomatis kebanned
+
+Open paid promote
+Check @parkerinfo
 """
 
         bot.send_message(
-            CHANNEL_ID,
-            komentar,
-            reply_to_message_id=sent.message_id
+            DISCUSSION_GROUP_ID,
+            komentar
+        )
+
+        # notif user
+        bot.reply_to(
+            message,
+            f"✅ Pesan terkirim!\n\n🔗 Link menfess:\n{post_link}"
         )
 
     except Exception as e:
@@ -129,7 +149,7 @@ def handle_photo(message):
 
         caption = message.caption or ""
 
-        # cek kata terlarang
+        # filter kata
         if contains_bad_words(caption):
 
             bot.reply_to(
@@ -146,23 +166,34 @@ def handle_photo(message):
             caption=caption
         )
 
+        # link post
+        post_link = f"https://t.me/c/{str(CHANNEL_ID)[4:]}/{sent.message_id}"
+
         # komentar otomatis
         komentar = """
-scam, perusuh, penipu tag @admins
-informasi base & paid promote @parkerinfo
+Ada scammer/rusuh? Tag @admin
+atau /report 3x maka otomatis kebanned
+
+Open paid promote
+Check @parkerinfo
 """
 
         bot.send_message(
-            CHANNEL_ID,
-            komentar,
-            reply_to_message_id=sent.message_id
+            DISCUSSION_GROUP_ID,
+            komentar
+        )
+
+        # notif user
+        bot.reply_to(
+            message,
+            f"✅ Foto berhasil terkirim!\n\n🔗 Link menfess:\n{post_link}"
         )
 
     except Exception as e:
         print("ERROR FOTO:", e)
 
 # =====================================
-# RUN BOT
+# RUN
 # =====================================
 
 print("BOT ONLINE")
