@@ -1,17 +1,14 @@
 import telebot
 
-# ==============================
-# CONFIG
-# ==============================
-
 TOKEN = "8662189428:AAHE702xAkCJ9Mie-_4XsLrsKyomFcSLSTQ"
-TARGET_GROUP = -1003949063805
+
+CHANNEL_ID = -1003949063805
 
 bot = telebot.TeleBot(TOKEN)
 
-# ==============================
+# =========================
 # KATA TERLARANG
-# ==============================
+# =========================
 
 BAD_WORDS = [
     "join ress",
@@ -45,9 +42,9 @@ BAD_WORDS = [
     "maker"
 ]
 
-# ==============================
-# CEK KATA TERLARANG
-# ==============================
+# =========================
+# FILTER KATA
+# =========================
 
 def contains_bad_words(text):
 
@@ -60,9 +57,9 @@ def contains_bad_words(text):
 
     return False
 
-# ==============================
+# =========================
 # START
-# ==============================
+# =========================
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -72,51 +69,50 @@ def start(message):
         "👋 Kirim menfess text atau foto."
     )
 
-# ==============================
+# =========================
 # TEXT
-# ==============================
+# =========================
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(
+    content_types=['text'],
+    func=lambda m: m.chat.type == "private"
+)
 def handle_text(message):
 
     try:
 
-        # cek kata terlarang
         if contains_bad_words(message.text):
 
             bot.reply_to(
                 message,
                 "❌ Pesan mengandung kata terlarang."
             )
-
             return
 
-        # kirim pesan utama
-        sent = bot.send_message(
-            TARGET_GROUP,
-            message.text
-        )
+        teks = f"""
+{message.text}
 
-        # komentar otomatis
-        komentar = """
+━━━━━━━━━━━━━━
 scam, perusuh, penipu tag @admins
 informasi base & paid promote @parkerinfo
 """
 
         bot.send_message(
-            TARGET_GROUP,
-            komentar,
-            reply_to_message_id=sent.message_id
+            CHANNEL_ID,
+            teks
         )
 
     except Exception as e:
-        print("ERROR TEXT:", e)
+        print(e)
 
-# ==============================
+# =========================
 # FOTO
-# ==============================
+# =========================
 
-@bot.message_handler(content_types=['photo'])
+@bot.message_handler(
+    content_types=['photo'],
+    func=lambda m: m.chat.type == "private"
+)
 def handle_photo(message):
 
     try:
@@ -126,42 +122,35 @@ def handle_photo(message):
         if message.caption:
             caption = message.caption
 
-        # cek caption
         if contains_bad_words(caption):
 
             bot.reply_to(
                 message,
                 "❌ Caption mengandung kata terlarang."
             )
-
             return
 
-        # kirim foto
-        sent = bot.send_photo(
-            TARGET_GROUP,
-            message.photo[-1].file_id,
-            caption=caption
-        )
+        caption_final = f"""
+{caption}
 
-        # komentar otomatis
-        komentar = """
+━━━━━━━━━━━━━━
 scam, perusuh, penipu tag @admins
 informasi base & paid promote @parkerinfo
 """
 
-        bot.send_message(
-            TARGET_GROUP,
-            komentar,
-            reply_to_message_id=sent.message_id
+        bot.send_photo(
+            CHANNEL_ID,
+            message.photo[-1].file_id,
+            caption=caption_final
         )
 
     except Exception as e:
-        print("ERROR FOTO:", e)
+        print(e)
 
-# ==============================
-# RUN BOT
-# ==============================
+# =========================
+# RUN
+# =========================
 
-print("BOT BERJALAN...")
+print("BOT ONLINE")
 
 bot.infinity_polling(skip_pending=True)
