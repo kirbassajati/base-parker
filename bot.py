@@ -4,7 +4,7 @@ import telebot
 # CONFIG
 # =====================================
 
-TOKEN = "TOKEN_BOT_KAMU"
+TOKEN = "8662189428:AAHE702xAkCJ9Mie-_4XsLrsKyomFcSLSTQ"
 
 # ID CHANNEL
 CHANNEL_ID = -1003949063805
